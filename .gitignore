@@ -1,0 +1,8 @@
+venv/
+.cursor*
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+.venv/

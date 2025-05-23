@@ -1,0 +1,133 @@
+{% extends 'partials/base.html' %}
+{% block title %}View Requests{% endblock %}
+
+{% block content %}
+<style>
+     .sidebar .nav-link {
+    color: #fff !important;
+    background: transparent;
+    border-radius: 5px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sidebar .nav-link.active,
+  .sidebar .nav-link:active {
+    color: #fff !important;
+    background-color: #146c43 !important;
+  }
+  .sidebar .nav-link:hover,
+  .sidebar .nav-link:focus {
+    color: #fff !important;
+    background-color: #157347 !important;
+    text-decoration: none;
+  }
+  .sidebar {
+    width: 250px;
+    background-color: #198754;
+    height: 100vh;
+    padding: 1.5rem;
+  }
+  .status-pending {
+    color: #ffc107;
+  }
+  .status-approved {
+    color: #198754;
+  }
+  .status-rejected {
+    color: #dc3545;
+  }
+</style>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    {% include 'partials/hod_sidebar.html' %}
+    
+    <!-- Main Content -->
+    <div class="flex-grow-1">
+        <div class="container mt-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Staff Requests</h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="filterRequests('all')">All</button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="filterRequests('pending')">Pending</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="filterRequests('approved')">Approved</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="filterRequests('rejected')">Rejected</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Staff Member</th>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in requests %}
+                                    <tr class="request-row" data-status="{{ request.status }}">
+                                        <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ request.staff.get_full_name }}</td>
+                                        <td>{{ request.product.name }}</td>
+                                        <td>{{ request.quantity }}</td>
+                                        <td>
+                                            <span class="status-{{ request.status }}">
+                                                {{ request.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if request.status == 'pending' %}
+                                                <form method="POST" class="d-inline" action="{% url 'hod-view-requests' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ request.id }}">
+                                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </button>
+                                                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <span class="text-muted">No actions available</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No requests found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterRequests(status) {
+    const rows = document.querySelectorAll('.request-row');
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %} 
