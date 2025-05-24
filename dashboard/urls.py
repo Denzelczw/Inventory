@@ -1,7 +1,7 @@
 from django.urls import path,include
 from . import views
 from rest_framework import routers
-
+from dashboard.ict_users import ict_dashboard
 
 router = routers.DefaultRouter()
 router.register(r'companies', views.CompanyViewSet, basename='company')
@@ -19,6 +19,7 @@ urlpatterns =[
     path('product/update/<int:pk>', views.product_update, name = 'dashboard-product-update'), 
     path('staff/detail/<int:pk>', views.staff_detail, name = 'dashboard-staff-detail'),    
     path('hod/dashboard/', views.hod_dashboard, name='hod_dashboard'),
+    path('ict/dashboard/', ict_dashboard, name='ict_dashboard'),
     path('hod/request/', views.hod_make_request, name='hod-make-request'),
     path('hod/approve-requests/', views.hod_approve_requests, name='hod-approve-requests'),
     path('hod/add-staff/', views.hod_add_staff, name='hod-add-staff'),
