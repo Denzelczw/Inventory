@@ -20,13 +20,16 @@ from user.forms import StaffCreationForm
 
 @login_required
 def index(request):
+    if request.user.profile.user_type.lower() == 'head_of_department':
+        return redirect('hod_dashboard')
+    elif request.user.profile.user_type.lower() == 'ict':
+        return redirect('ict_dashboard')
+    
     orders = Order.objects.all()
     products = Product.objects.all()
     workers_count = User.objects.all().count()
     order_count = orders.count()
     product_count = products.count()
-    if request.user.profile.user_type.lower() == 'head_of_department':
-        return redirect('hod_dashboard')
 
     if request.method == 'POST':
         form = OrderForm(request.POST)

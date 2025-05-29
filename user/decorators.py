@@ -9,3 +9,11 @@ def hod_required(view_func):
         return redirect('login')  # or a 403 page
     return _wrapped_view 
 
+def ict_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if hasattr(request.user, 'profile') and request.user.profile.user_type == 'ict':
+            return view_func(request, *args, **kwargs)
+        return redirect('login')  # or a 403 page
+    return _wrapped_view 
+
